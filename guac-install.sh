@@ -208,11 +208,7 @@ service ${TOMCAT} restart
 # Create guacamole_db and grant guacamole_user permissions to it
 
 # SQL code
-SQLCODE="
-create database guacamole_db;
-create user 'guacamole_user'@'localhost' identified by \"$guacdbuserpassword\";
-GRANT SELECT,INSERT,UPDATE,DELETE ON guacamole_db.* TO 'guacamole_user'@'localhost';
-flush privileges;"
+SQLCODE=" create database guacamole_db; create user 'guacamole_user'@'localhost' identified by \"$guacdbuserpassword\"; GRANT SELECT,INSERT,UPDATE,DELETE ON guacamole_db.* TO 'guacamole_user'@'localhost'; flush privileges;"
 
 # Execute SQL code
 echo $SQLCODE | mysql -u root -p$mysqlrootpassword
