@@ -87,6 +87,7 @@ then
     TOMCAT="tomcat8"
 else
     TOMCAT="tomcat7"
+    TOMCAT="tomcat8"
 fi
 
 # Uncomment to manually force a tomcat version
