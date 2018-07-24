@@ -131,9 +131,17 @@ if [ $? -ne 0 ]; then
     exit
 fi
 
+wget -O guacamole-auth-openid-${GUACVERSION}.tar.gz ${SERVER}/binary/guacamole-auth-openid-${GUACVERSION}.tar.gz
+if [ $? -ne 0 ]; then
+    echo "Failed to download guacamole-auth-openid-${GUACVERSION}.tar.gz"
+    echo "${SERVER}/binary/guacamole-auth-openid-${GUACVERSION}.tar.gz"
+    exit
+fi
+
 # Extract Guacamole files
 tar -xzf guacamole-server-${GUACVERSION}.tar.gz
 tar -xzf guacamole-auth-jdbc-${GUACVERSION}.tar.gz
+tar -xzf guacamole-auth-openid-${GUACVERSION}.tar.gz
 
 # Make directories
 mkdir -p /etc/guacamole/lib
@@ -173,6 +181,8 @@ ln -s /etc/guacamole/guacamole.war /var/lib/${TOMCAT}/webapps/
 ln -s /usr/local/lib/freerdp/guac*.so /usr/lib/${BUILD_FOLDER}/freerdp/
 ln -s /usr/share/java/mysql-connector-java.jar /etc/guacamole/lib/
 cp guacamole-auth-jdbc-${GUACVERSION}/mysql/guacamole-auth-jdbc-mysql-${GUACVERSION}.jar /etc/guacamole/extensions/
+cp guacamole-auth-openid-${GUACVERSION}/guacamole-auth-openid-${GUACVERSION}.jar /etc/guacamole/extensions/
+
 
 # Configure guacamole.properties
 echo "mysql-hostname: localhost" >> /etc/guacamole/guacamole.properties
@@ -180,6 +190,16 @@ echo "mysql-port: 3306" >> /etc/guacamole/guacamole.properties
 echo "mysql-database: guacamole_db" >> /etc/guacamole/guacamole.properties
 echo "mysql-username: guacamole_user" >> /etc/guacamole/guacamole.properties
 echo "mysql-password: $guacdbuserpassword" >> /etc/guacamole/guacamole.properties
+
+echo "" >> /etc/guacamole/guacamole.properties
+echo "" >> /etc/guacamole/guacamole.properties
+echo "# OpenID config" >> /etc/guacamole/guacamole.properties
+
+echo "openid-authorization-endpoint: https://login.microsoftonline.com/8991ab28-e2ec-45b3-8526-ccc3e0d0e10f/oauth2/v2.0/authorize" >> /etc/guacamole/guacamole.properties
+echo "openid-jwks-endpoint: https://login.microsoftonline.com/8991ab28-e2ec-45b3-8526-ccc3e0d0e10f/discovery/v2.0/keys" >> /etc/guacamole/guacamole.properties
+echo "openid-issuer: https://login.microsoftonline.com/8991ab28-e2ec-45b3-8526-ccc3e0d0e10f/v2.0" >> /etc/guacamole/guacamole.properties
+echo "openid-client-id: 3bfc70dd-c49f-4d52-b0eb-bf0bcbda875e" >> /etc/guacamole/guacamole.properties
+echo "openid-redirect-uri:"http://10.40.2.5:8080/guacamole/" >> /etc/guacamole/guacamole.properties
 
 # restart tomcat
 service ${TOMCAT} restart
